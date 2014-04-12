@@ -1,0 +1,73 @@
+<?php
+
+class LTIPlugin extends Plugin
+{
+    public $is_course_plugin = true;
+
+    //When creating a new course this settings are added to the course
+    public $course_settings = array(
+                    array('name' => 'lti_title',  'type' => 'text'),
+//                    array('name' => 'big_blue_button_record_and_store', 'type' => 'checkbox')
+    );
+
+    static function create() {
+        static $result = null;
+        return $result ? $result : $result = new self();
+    }
+
+    protected function __construct() {
+        parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'lti_endpoint' =>'text', 'lti_key' => 'text', 'lti_secret' => 'text'));
+    }
+
+    function install() {
+        $table = Database::get_main_table('plugin_lti_tool');
+        $sql = "CREATE TABLE IF NOT EXISTS $table (
+                id INT unsigned NOT NULL auto_increment PRIMARY KEY,
+                c_id INT unsigned NOT NULL DEFAULT 0,
+                tool_name VARCHAR(255) NOT NULL DEFAULT '',
+                custom VARCHAR(255) NOT NULL DEFAULT '')";
+        Database::query($sql);
+
+        //Installing course settings
+        $this->install_course_fields_in_all_courses();
+    }
+
+    function uninstall() {
+        $t_settings = Database::get_main_table(TABLE_MAIN_SETTINGS_CURRENT);
+        $t_options = Database::get_main_table(TABLE_MAIN_SETTINGS_OPTIONS);
+        $t_tool = Database::get_course_table(TABLE_TOOL_LIST);
+
+        //New settings
+
+        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_tool_enable'";
+        Database::query($sql);
+        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_endpoint'";
+        Database::query($sql);
+        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_key'";
+        Database::query($sql);
+        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_secret'";
+        Database::query($sql);
+        
+        //Old settings deleting just in case
+        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_plugin'";
+        Database::query($sql);
+        $sql = "DELETE FROM $t_options WHERE variable  = 'lti_plugin'";
+        Database::query($sql);
+        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_plugin_endpoint'";
+        Database::query($sql);
+        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_plugin_key'";
+        Database::query($sql);
+        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_plugin_secret'";
+        Database::query($sql);
+        
+        //hack to get rid of Database::query warning (please add c_id...)
+        $sql = "DELETE FROM $t_tool WHERE name = 'external_tool' AND c_id = c_id";
+        Database::query($sql);
+
+        $sql = "DROP TABLE IF EXISTS plugin_lti_tool";
+        Database::query($sql);
+
+        //Deleting course settings
+        $this->uninstall_course_fields_in_all_courses();
+    }
+}
