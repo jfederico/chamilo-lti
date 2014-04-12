@@ -1,5 +1,11 @@
 <?php
 
+
+
+
+
+
+
 class LTIPlugin extends Plugin
 {
     public $is_course_plugin = true;
@@ -7,7 +13,7 @@ class LTIPlugin extends Plugin
     //When creating a new course this settings are added to the course
     public $course_settings = array(
                     array('name' => 'lti_title',  'type' => 'text'),
-//                    array('name' => 'big_blue_button_record_and_store', 'type' => 'checkbox')
+//                    array('name' => 'lti_variable_tile', 'type' => 'checkbox')
     );
 
     static function create() {
@@ -16,7 +22,7 @@ class LTIPlugin extends Plugin
     }
 
     protected function __construct() {
-        parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'lti_endpoint' =>'text', 'lti_key' => 'text', 'lti_secret' => 'text'));
+        parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'endpoint' =>'text', 'key' => 'text', 'secret' => 'text'));
     }
 
     function install() {
@@ -49,9 +55,9 @@ class LTIPlugin extends Plugin
         Database::query($sql);
         
         //Old settings deleting just in case
-        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_plugin'";
-        Database::query($sql);
         $sql = "DELETE FROM $t_options WHERE variable  = 'lti_plugin'";
+        Database::query($sql);
+        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_plugin'";
         Database::query($sql);
         $sql = "DELETE FROM $t_settings WHERE variable = 'lti_plugin_endpoint'";
         Database::query($sql);
@@ -61,7 +67,7 @@ class LTIPlugin extends Plugin
         Database::query($sql);
         
         //hack to get rid of Database::query warning (please add c_id...)
-        $sql = "DELETE FROM $t_tool WHERE name = 'external_tool' AND c_id = c_id";
+        $sql = "DELETE FROM $t_tool WHERE name = 'lti' AND c_id = c_id";
         Database::query($sql);
 
         $sql = "DROP TABLE IF EXISTS plugin_lti_tool";
