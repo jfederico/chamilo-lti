@@ -12,8 +12,14 @@ class LTIPlugin extends Plugin
 
     //When creating a new course this settings are added to the course
     public $course_settings = array(
-                    array('name' => 'lti_title',  'type' => 'text'),
-//                    array('name' => 'lti_variable_tile', 'type' => 'checkbox')
+                    array('name' => 'lti_course_title',  'type' => 'text'),
+                    array('name' => 'lti_course_description',  'type' => 'text'),
+                    array('name' => 'lti_course_endpoint',  'type' => 'text'),
+                    array('name' => 'lti_course_key',  'type' => 'text'),
+                    array('name' => 'lti_course_secret',  'type' => 'text'),
+                    array('name' => 'lti_course_custom',  'type' => 'textarea'),
+                    array('name' => 'lti_course_iframe_height',  'type' => 'text'),
+                    array('name' => 'lti_course_open_new_window', 'type' => 'checkbox')
     );
 
     static function create() {
@@ -22,7 +28,8 @@ class LTIPlugin extends Plugin
     }
 
     protected function __construct() {
-        parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'endpoint' =>'text', 'key' => 'text', 'secret' => 'text'));
+        //parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'endpoint' =>'text', 'key' => 'text', 'secret' => 'text', 'custom' => 'textarea'));
+        parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'endpoint' =>'text', 'key' => 'text', 'secret' => 'text', 'custom' => 'text'));
     }
 
     function install() {
