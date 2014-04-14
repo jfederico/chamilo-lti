@@ -45,14 +45,22 @@ $roles_to_string = isset($roles_to_string)? rtrim($roles_to_string, ", "): '';
 
 $portal_name = api_get_setting('siteName');
 
-/*
+$tool_consumer_instance_guid = parse_url($_configuration['root_web'], PHP_URL_HOST);
+$tool_consumer_instance_description = null;
+
+
+
+$lti_course_custom = api_get_course_setting('lti_course_custom', $course_code);
+
+$custom_params = split(";", $lti_course_custom);
+
 $y = '';
-foreach( api_get_tool_information_by_name('lti') as $x ){
-    $y .= empty($y)? $x: ', '.$x;
+foreach( $custom_params as $x ){
+$y .= empty($y)? 'custom_'.$x: ', custom_'.$x;
 }
 $content = '<!-- HOLA ['.$y.'] HOLA -->
 ';
-*/
+
 
 //Code imported from IMS
 require_once dirname(__FILE__).'/lib/lti_util.php';
@@ -73,11 +81,17 @@ $lmsdata = array(
 		"context_label" => $course_info['id'],
         "tool_consumer_info_product_family_code" => strtolower(api_get_software_name()),
         "tool_consumer_info_version" => api_get_version(), 
-		"tool_consumer_instance_guid" => parse_url($_configuration['root_web'], PHP_URL_HOST),
+		"tool_consumer_instance_guid" => $tool_consumer_instance_guid,
         "tool_consumer_instance_name" => $portal_name,
-		//"tool_consumer_instance_description" => "University of School (LMSng)",
+		"tool_consumer_instance_description" => $tool_consumer_instance_description,
         "tool_consumer_instance_url" => $_configuration['root_web']
 );
+
+foreach( $custom_params as $custom_param ){
+    $custom = split('=', $custom_param);
+    $lmsdata['custom_'.$custom[0]] = $custom[1];
+}
+
 
 foreach ($lmsdata as $k => $val ) {
 	if ( $_POST[$k] && strlen($_POST[$k]) > 0 ) {
@@ -105,7 +119,8 @@ $parms["oauth_callback"] = "about:blank";
 
 $parms = signParameters($parms, $lti->endpoint, "POST", $lti->key, $lti->secret, "Press to Launch", $tool_consumer_instance_guid, $tool_consumer_instance_description);
 
-$content = ''; //<h2>'.get_lang('lti_tool_name').'</h2>';
+$content .= '
+'; //<h2>'.get_lang('lti_tool_name').'</h2>';
          
 $content .= postLaunchHTML($parms, $lti->endpoint, api_get_course_setting('lti_course_debug_launch', $course_code) == 1 ? true : false,
 		"width=\"100%\" height=\"".$iframe_heigth."\" scrolling=\"auto\" frameborder=\"0\" transparency");
