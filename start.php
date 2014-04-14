@@ -28,32 +28,55 @@ if ($lti->plugin_enabled) {
 
 $iframe_heigth = api_get_course_setting('lti_course_iframe_height', $course_code); 
 $iframe_heigth = (int)$iframe_heigth > 0 ? $iframe_heigth : "500";
-$open_new_window = api_get_course_setting('lti_open_new_window', $course_code) == 1 ? true : false;
+$open_new_window = api_get_course_setting('lti_course_open_new_window', $course_code) == 1 ? true : false;
 
+
+$tool_info = api_get_tool_information_by_name($course_plugin);
+// resource_id is going to be replaced by the right one once this supports multiple LTI links
+$resource_id = $tool_info['c_id'].'-'.$tool_info['id'];
+
+$current_user_id = api_get_user_id();
+$user_info = api_get_user_info($current_user_id);
+$course_info = api_get_course_info($course_code);
+$user_roles = api_detect_user_roles($current_user_id, $course_code);
+// Roles need to be converted to LIS roles befor the trim
+$roles_to_string = api_get_roles_to_string($user_roles);
+$roles_to_string = isset($roles_to_string)? rtrim($roles_to_string, ", "): '';
+
+$portal_name = api_get_setting('siteName');
+
+/*
+$y = '';
+foreach( api_get_tool_information_by_name('lti') as $x ){
+    $y .= empty($y)? $x: ', '.$x;
+}
+$content = '<!-- HOLA ['.$y.'] HOLA -->
+';
+*/
 
 //Code imported from IMS
 require_once dirname(__FILE__).'/lib/lti_util.php';
 
 $lmsdata = array(
-		"resource_link_id" => "120988f929-274612",
-		"resource_link_title" => "Weekly Blog",
-		"resource_link_description" => "A weekly blog.",
-		"user_id" => "292832126",
-		"roles" => "Instructor",  // or Learner
-		"lis_person_name_full" => 'Jane Q. Public',
-		"lis_person_name_family" => 'Public',
-		"lis_person_name_given" => 'Given',
-		"lis_person_contact_email_primary" => "user@school.edu",
-		"lis_person_sourcedid" => "school.edu:user",
-		"context_id" => "456434513",
-		"context_title" => "Design of Personal Environments",
-		"context_label" => "SI182",
-        "tool_consumer_info_product_family_code" => "chamilo",
-        "tool_consumer_info_version" => "1.9.6", 
-		"tool_consumer_instance_guid" => "lmsng.school.edu",
-        "tool_consumer_instance_name" => "SchoolU",
-		"tool_consumer_instance_description" => "University of School (LMSng)",
-        "tool_consumer_instance_url" => "http://lmsng.school.edu"
+		"resource_link_id" => $resource_id,
+		"resource_link_title" => api_get_course_setting('lti_course_title', $course_code),
+		"resource_link_description" => api_get_course_setting('lti_course_description', $course_code),
+		"user_id" => $current_user_id,
+		"roles" => $roles_to_string,  // or Learner
+        "lis_person_name_full" =>  $user_info['complete_name'], //api_get_person_name($user_info['firstname'], $user_info['lastname'], null, null, null),
+		"lis_person_name_family" => $user_info['lastname'],
+		"lis_person_name_given" => $user_info['firstname'],
+		"lis_person_contact_email_primary" => $user_info['mail'],
+		//"lis_person_sourcedid" => "school.edu:user",
+		"context_id" => $course_info['real_id'],
+		"context_title" => $course_info['title'],
+		"context_label" => $course_info['id'],
+        "tool_consumer_info_product_family_code" => strtolower(api_get_software_name()),
+        "tool_consumer_info_version" => api_get_version(), 
+		"tool_consumer_instance_guid" => parse_url($_configuration['root_web'], PHP_URL_HOST),
+        "tool_consumer_instance_name" => $portal_name,
+		//"tool_consumer_instance_description" => "University of School (LMSng)",
+        "tool_consumer_instance_url" => $_configuration['root_web']
 );
 
 foreach ($lmsdata as $k => $val ) {
@@ -82,13 +105,13 @@ $parms["oauth_callback"] = "about:blank";
 
 $parms = signParameters($parms, $lti->endpoint, "POST", $lti->key, $lti->secret, "Press to Launch", $tool_consumer_instance_guid, $tool_consumer_instance_description);
 
- $content = '<h2>'.get_lang('lti_tool_name').'</h2>';
+$content = ''; //<h2>'.get_lang('lti_tool_name').'</h2>';
          
- $content .= postLaunchHTML($parms, $lti->endpoint, true,
+$content .= postLaunchHTML($parms, $lti->endpoint, api_get_course_setting('lti_course_debug_launch', $course_code) == 1 ? true : false,
 		"width=\"100%\" height=\"".$iframe_heigth."\" scrolling=\"auto\" frameborder=\"0\" transparency");
 
  /*
- $content .= '
+$content .= '
          <form action="'.$lti->endpoint.'" target="lti-launch" method="post">
            <input type="hidden" name="text" id="text">
            <input type="submit" value="launch">

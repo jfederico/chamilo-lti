@@ -27,5 +27,5 @@ $strings['lti_course_secret'] = 'Shared secret';
 $strings['lti_course_custom'] = 'Custom parameters';
 $strings['lti_course_open_new_window'] = 'Open in a new window';
 $strings['lti_course_iframe_height'] = 'iFrame heigth';
-
+$strings['lti_course_debug_launch'] = 'Debug launch';
 

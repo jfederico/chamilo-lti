@@ -19,7 +19,8 @@ class LTIPlugin extends Plugin
                     array('name' => 'lti_course_secret',  'type' => 'text'),
                     array('name' => 'lti_course_custom',  'type' => 'textarea'),
                     array('name' => 'lti_course_iframe_height',  'type' => 'text'),
-                    array('name' => 'lti_course_open_new_window', 'type' => 'checkbox')
+                    array('name' => 'lti_course_open_new_window', 'type' => 'checkbox'),
+                    array('name' => 'lti_course_debug_launch', 'type' => 'checkbox')
     );
 
     static function create() {
