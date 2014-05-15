@@ -33,10 +33,10 @@ class LTIPlugin extends Plugin
                 id INT unsigned NOT NULL auto_increment PRIMARY KEY,
                 c_id INT unsigned NOT NULL DEFAULT 0,
                 tool_name VARCHAR(255) NOT NULL DEFAULT '',
-                endpoint VARCHAR(255) NOT NULL DEFAULT '',
-                key VARCHAR(255) NOT NULL DEFAULT '',
-                secret VARCHAR(255) NOT NULL DEFAULT '',
-                custom VARCHAR(255) NOT NULL DEFAULT '')";
+                tool_endpoint VARCHAR(255) NOT NULL DEFAULT '',
+                tool_key VARCHAR(255) NOT NULL DEFAULT '',
+                tool_secret VARCHAR(255) NOT NULL DEFAULT '',
+                tool_custom VARCHAR(255) NOT NULL DEFAULT '')";
         Database::query($sql);
 
         //Installing course settings
