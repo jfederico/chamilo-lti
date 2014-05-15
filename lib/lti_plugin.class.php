@@ -1,11 +1,5 @@
 <?php
 
-
-
-
-
-
-
 class LTIPlugin extends Plugin
 {
     public $is_course_plugin = true;
@@ -39,6 +33,9 @@ class LTIPlugin extends Plugin
                 id INT unsigned NOT NULL auto_increment PRIMARY KEY,
                 c_id INT unsigned NOT NULL DEFAULT 0,
                 tool_name VARCHAR(255) NOT NULL DEFAULT '',
+                endpoint VARCHAR(255) NOT NULL DEFAULT '',
+                key VARCHAR(255) NOT NULL DEFAULT '',
+                secret VARCHAR(255) NOT NULL DEFAULT '',
                 custom VARCHAR(255) NOT NULL DEFAULT '')";
         Database::query($sql);
 
@@ -52,7 +49,6 @@ class LTIPlugin extends Plugin
         $t_tool = Database::get_course_table(TABLE_TOOL_LIST);
 
         //New settings
-
         $sql = "DELETE FROM $t_settings WHERE variable = 'lti_tool_enable'";
         Database::query($sql);
         $sql = "DELETE FROM $t_settings WHERE variable = 'lti_endpoint'";
@@ -61,7 +57,9 @@ class LTIPlugin extends Plugin
         Database::query($sql);
         $sql = "DELETE FROM $t_settings WHERE variable = 'lti_secret'";
         Database::query($sql);
-        
+        $sql = "DELETE FROM $t_settings WHERE variable = 'lti_custom'";
+        Database::query($sql);
+
         //Old settings deleting just in case
         $sql = "DELETE FROM $t_options WHERE variable  = 'lti_plugin'";
         Database::query($sql);
@@ -73,7 +71,7 @@ class LTIPlugin extends Plugin
         Database::query($sql);
         $sql = "DELETE FROM $t_settings WHERE variable = 'lti_plugin_secret'";
         Database::query($sql);
-        
+
         //hack to get rid of Database::query warning (please add c_id...)
         $sql = "DELETE FROM $t_tool WHERE name = 'lti' AND c_id = c_id";
         Database::query($sql);
@@ -83,5 +81,12 @@ class LTIPlugin extends Plugin
 
         //Deleting course settings
         $this->uninstall_course_fields_in_all_courses();
+    }
+
+    function course_settings_updated($values = array()) {
+        if (!is_array($values) or count($values)==0) {
+            return false;
+        }
+        error_log(json_encode($values), 0);
     }
 }
