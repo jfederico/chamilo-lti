@@ -23,8 +23,9 @@ class LTIPlugin extends Plugin
     }
 
     protected function __construct() {
-        //parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'endpoint' =>'text', 'key' => 'text', 'secret' => 'text', 'custom' => 'textarea'));
-        parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'endpoint' =>'text', 'key' => 'text', 'secret' => 'text', 'custom' => 'text'));
+        //parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'lti_global_tool_producer' => 'meta-form'));
+        //parent::__construct('1.0', 'Jesus Federico', array('lti_global_tool_enable' => 'boolean', 'lti_global_endpoint' => 'text', 'lti_global_key' => 'text', 'lti_global_secret' => 'text', 'lti_global_custom' => 'textarea'));
+        parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'lti_global_endpoint' => 'text', 'lti_global_key' => 'text', 'lti_global_secret' => 'text', 'lti_global_custom' => 'text'));
     }
 
     function install() {
