@@ -4,8 +4,11 @@ $strings['plugin_title'] = 'External Tool';
 $strings['plugin_comment'] = 'Add a link to an external tool in a Chamilo course using the IMS LTI 1.0 standard';
 
 $strings['lti_tool_name'] = 'External Tool';
+
+// Error messages
 $strings['lti_warning'] = 'My warning';
 $strings['lti_warning_external_tool_not_configured'] = 'External Tool is not configured';
+
 
 // Global configuration
 $strings['tool_enable'] = 'External tool<br>enabled';
@@ -31,3 +34,4 @@ $strings['lti_course_open_new_window'] = 'Open in a new window';
 $strings['lti_course_iframe_height'] = 'iFrame heigth';
 $strings['lti_course_debug_launch'] = 'Debug launch';
 
+// Instance
