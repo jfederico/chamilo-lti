@@ -1,13 +1,20 @@
 <?php
-
 require_once dirname(__FILE__).'/config.php';
+
+$language_file = array('lti');
 
 $course_plugin = 'lti'; //needed in order to load the plugin lang variables
 $course_code = api_get_course_id();
+
+$lti_tool_name = get_lang('lti_tool_name');
+$lti_warning_external_tool_not_configured = get_lang('lti_warning_external_tool_not_configured');
+
+$tool_name = $lti_tool_name;
+$tpl = new Template();
 $lti = new lti();
 
-$tool_name = 'External Tool'; //get_lang('lti_tool_name');
-$tpl = new Template($tool_name);
+/// Initialise content
+$content = '';
 
 if ($lti->plugin_enabled) {
     //if ($lti->is_server_running()) {
@@ -23,8 +30,19 @@ if ($lti->plugin_enabled) {
         //$message = Display::return_message(get_lang('lti_warning'), 'warning');
         //}
 } else {
-    $message = Display::return_message(get_lang('lti_warning_external_tool_not_configured'), 'warning');
+    $message = Display::return_message($lti_warning_external_tool_not_configured, 'warning');
 }
+
+$content .= '<h2>'.$lti_tool_name.'</h2>';
+$content .= '<h3>'.$lti_warning_external_tool_not_configured.'</h3>';
+
+if (isset($message) )
+    $tpl->assign('message', $message);
+
+$tpl->assign('content', $content);
+$tpl->display_one_col_template();
+
+return;
 
 $iframe_heigth = api_get_course_setting('lti_course_iframe_height', $course_code); 
 $iframe_heigth = (int)$iframe_heigth > 0 ? $iframe_heigth : "500";
@@ -58,7 +76,7 @@ $y = '';
 foreach( $custom_params as $x ){
 $y .= empty($y)? 'custom_'.$x: ', custom_'.$x;
 }
-$content = '<!-- HOLA ['.$y.'] HOLA -->
+$content .= '<!-- HOLA ['.$y.'] HOLA -->
 ';
 
 
@@ -120,12 +138,12 @@ $parms["oauth_callback"] = "about:blank";
 $parms = signParameters($parms, $lti->endpoint, "POST", $lti->key, $lti->secret, "Press to Launch", $tool_consumer_instance_guid, $tool_consumer_instance_description);
 
 $content .= '
-'; //<h2>'.get_lang('lti_tool_name').'</h2>';
-         
+<h2>'.get_lang('lti_tool_name').'</h2>';
+
+/*
 $content .= postLaunchHTML($parms, $lti->endpoint, api_get_course_setting('lti_course_debug_launch', $course_code) == 1 ? true : false,
 		"width=\"100%\" height=\"".$iframe_heigth."\" scrolling=\"auto\" frameborder=\"0\" transparency");
 
- /*
 $content .= '
          <form action="'.$lti->endpoint.'" target="lti-launch" method="post">
            <input type="hidden" name="text" id="text">
@@ -146,6 +164,3 @@ if (isset($message) )
 
 $tpl->assign('content', $content);
 $tpl->display_one_col_template();
-
-
-?>

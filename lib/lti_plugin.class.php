@@ -5,17 +5,18 @@ class LTIPlugin extends Plugin
     public $is_course_plugin = true;
 
     //When creating a new course this settings are added to the course
-    public $course_settings = array(
-                    array('name' => 'lti_course_title',  'type' => 'text'),
-                    array('name' => 'lti_course_description',  'type' => 'text'),
-                    array('name' => 'lti_course_endpoint',  'type' => 'text'),
-                    array('name' => 'lti_course_key',  'type' => 'text'),
-                    array('name' => 'lti_course_secret',  'type' => 'text'),
-                    array('name' => 'lti_course_custom',  'type' => 'textarea'),
-                    array('name' => 'lti_course_iframe_height',  'type' => 'text'),
-                    array('name' => 'lti_course_open_new_window', 'type' => 'checkbox'),
-                    array('name' => 'lti_course_debug_launch', 'type' => 'checkbox')
-    );
+    //Course tool providers should be set up here
+    //public $course_settings = array(
+    //                array('name' => 'lti_course_title',  'type' => 'text'),
+    //                array('name' => 'lti_course_description',  'type' => 'text'),
+    //                array('name' => 'lti_course_endpoint',  'type' => 'text'),
+    //                array('name' => 'lti_course_key',  'type' => 'text'),
+    //                array('name' => 'lti_course_secret',  'type' => 'text'),
+    //                array('name' => 'lti_course_custom',  'type' => 'textarea'),
+    //                array('name' => 'lti_course_iframe_height',  'type' => 'text'),
+    //                array('name' => 'lti_course_open_new_window', 'type' => 'checkbox'),
+    //                array('name' => 'lti_course_debug_launch', 'type' => 'checkbox')
+    //);
 
     static function create() {
         static $result = null;
@@ -25,7 +26,9 @@ class LTIPlugin extends Plugin
     protected function __construct() {
         //parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'lti_global_tool_producer' => 'meta-form'));
         //parent::__construct('1.0', 'Jesus Federico', array('lti_global_tool_enable' => 'boolean', 'lti_global_endpoint' => 'text', 'lti_global_key' => 'text', 'lti_global_secret' => 'text', 'lti_global_custom' => 'textarea'));
-        parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'lti_global_endpoint' => 'text', 'lti_global_key' => 'text', 'lti_global_secret' => 'text', 'lti_global_custom' => 'text'));
+        //parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'lti_global_endpoint' => 'text', 'lti_global_key' => 'text', 'lti_global_secret' => 'text', 'lti_global_custom' => 'text'));
+        parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean'));
+        //Global tool providers should be set up here
     }
 
     function install() {
@@ -37,7 +40,7 @@ class LTIPlugin extends Plugin
                 tool_endpoint VARCHAR(255) NOT NULL DEFAULT '',
                 tool_key VARCHAR(255) NOT NULL DEFAULT '',
                 tool_secret VARCHAR(255) NOT NULL DEFAULT '',
-                tool_custom VARCHAR(255) NOT NULL DEFAULT '')";
+                tool_custom TEXT NOT NULL DEFAULT '')";
         Database::query($sql);
 
         //Installing course settings

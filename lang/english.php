@@ -1,13 +1,16 @@
 <?php
 
-$strings['plugin_title'] = 'External Tool';
-$strings['plugin_comment'] = 'Add a link to an external tool in a Chamilo course using the IMS LTI 1.0 standard';
+$strings['plugin_title'] = 'External Tools';
+$strings['plugin_comment'] = 'This plugin is the implementation of the IMS LTI 1.0 standard for Chamilo. It enables administrators and teachers to add links into courses that allow users to interact with tool providers.';
 
-$strings['lti_tool_name'] = 'External Tool';
+$strings['External Tools'] = "External Tools";
 
+$strings['lti_tool_name'] = "External Tools";
+
+// Warning messages
+$strings['lti_warning_external_tool_not_configured'] = 'External Tools not configured';
 // Error messages
-$strings['lti_warning'] = 'My warning';
-$strings['lti_warning_external_tool_not_configured'] = 'External Tool is not configured';
+$strings['lti_error_general'] = 'General error';
 
 
 // Global configuration
