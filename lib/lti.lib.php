@@ -32,7 +32,7 @@ class lti {
 
         $this->table = Database::get_main_table('plugin_lti_tool');
 
-        if ($lti_plugin == true) {
+        if ($lti_plugin == 'true') {
             //$this->endpoint = isset($lti_course_endpoint)? $lti_course_endpoint: $lti_endpoint;
             //$this->key = isset($lti_course_key)? $lti_course_key: $lti_key;
             //$this->secret = isset($lti_course_secret)? $lti_course_secret: $lti_secret;

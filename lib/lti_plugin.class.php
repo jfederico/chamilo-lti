@@ -93,4 +93,8 @@ class LTIPlugin extends Plugin
         }
         error_log(json_encode($values), 0);
     }
+    
+    function is_enabled(){
+        return $this->get('tool_enable') == "true"? true: false;
+    }
 }

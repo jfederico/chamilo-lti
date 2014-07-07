@@ -1,40 +1,54 @@
 <?php
 require_once dirname(__FILE__).'/config.php';
 
-$language_file = array('lti');
-
 $course_plugin = 'lti'; //needed in order to load the plugin lang variables
-$course_code = api_get_course_id();
 
-$lti_tool_name = get_lang('lti_tool_name');
-$lti_warning_external_tool_not_configured = get_lang('lti_warning_external_tool_not_configured');
+$plugin = LTIPlugin::create();
+$tool_name = $plugin->get_lang('lti_tool_name');
 
-$tool_name = $lti_tool_name;
-$tpl = new Template();
-$lti = new lti();
+if ($plugin->is_enabled()) {
+    /// Initialise content
+    $content = '';
+    
+    if ( isset($tool_name) )
+        $content .= '<h2>'.$tool_name.'</h2>';
+    
+} else {
+    $message = Display::return_message($plugin->get_lang('lti_warning_external_tool_not_enabled'), 'warning');
+}
+
+$tpl = new Template($tool_name);
+
+if ( isset($message) ) 
+    $tpl->assign('message', $message);
+
+$tpl->assign('content', $content);
+$tpl->display_one_col_template();
+
+return;
+
+
+
+$_tool_name = &$lti_tool_name;
+//$_tool_name = get_lang('lti_tool_name');
 
 /// Initialise content
 $content = '';
 
 if ($lti->plugin_enabled) {
-    //if ($lti->is_server_running()) {
-
-        //if (isset($_GET['launch']) && $_GET['launch'] == 1) {
-            //echo '<p>Hello GET launch</p>';
-
-        //} else {
-            //echo '<p>Hello POST (or other) launch</p>';
-
-        //}
-    //} else {
-        //$message = Display::return_message(get_lang('lti_warning'), 'warning');
-        //}
 } else {
-    $message = Display::return_message($lti_warning_external_tool_not_configured, 'warning');
+    $message = Display::return_message(get_lang('lti_warning_external_tool_not_configured'), 'warning');
 }
 
-$content .= '<h2>'.$lti_tool_name.'</h2>';
-$content .= '<h3>'.$lti_warning_external_tool_not_configured.'</h3>';
+if( isset($_tool_name) )
+    $content .= '<h2>'.$_tool_name.'</h2>';
+$content .= '<h2>'.get_lang('lti_tool_name').'</h2>';
+$content .= '<h2>'.get_lang('lti_tool_name').'</h2>';
+$content .= '<h3>'.get_lang('lti_warning_external_tool_not_configured').'</h3>';
+
+$t = "Hello";
+error_log($t);
+
 
 if (isset($message) )
     $tpl->assign('message', $message);
@@ -43,6 +57,8 @@ $tpl->assign('content', $content);
 $tpl->display_one_col_template();
 
 return;
+
+$course_code = api_get_course_id();
 
 $iframe_heigth = api_get_course_setting('lti_course_iframe_height', $course_code); 
 $iframe_heigth = (int)$iframe_heigth > 0 ? $iframe_heigth : "500";
