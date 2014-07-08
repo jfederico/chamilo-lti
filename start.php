@@ -6,22 +6,64 @@ $course_plugin = 'lti'; //needed in order to load the plugin lang variables
 $plugin = LTIPlugin::create();
 $tool_name = $plugin->get_lang('lti_tool_name');
 
+$tpl = new Template($tool_name);
+
 if ($plugin->is_enabled()) {
+    //$message = Display::return_message('Everything OK', 'success');
+
     /// Initialise content
     $content = '';
     
-    if ( isset($tool_name) )
-        $content .= '<h2>'.$tool_name.'</h2>';
+    /// Start building the content
+    //if ( isset($tool_name) )
+    //    $content .= '<h2>'.$tool_name.'</h2>'."\n";
+    
+    //display_action_links($work_id, $curdirpath, $show_tool_options, $display_upload_link, $action);
+    
+/*    
+    <div class="actions">
+      <a href="/chamilo/main/work/work.php?cidReq=ENGLISH101&id_session=0&gidReq=0&amp;action=create_dir&origin=&gradebook="><img src="http://web-dev.123it.ca/chamilo/main/img/icons/32/new_work.png" alt="Create assignment" title="Create assignment"  /></a><a href="/chamilo/main/work/work.php?cidReq=ENGLISH101&id_session=0&gidReq=0&amp;action=settings&amp;origin=&amp;gradebook="><img src="http://web-dev.123it.ca/chamilo/main/img/icons/32/settings.png" alt="Assignments settings" title="Assignments settings"  /></a>
+    </div>
+    <table class="data_table" id="work53bb66577f0fe">
+      <tr class="row_odd">
+        <th style="width:40px">Type</th>
+        <th><a href="/chamilo/main/work/work.php?cidReq=ENGLISH101&id_session=0&gidReq=0&amp;work_direction=DESC&amp;work_page_nr=1&amp;work_per_page=20&amp;work_column=1&amp;id=&amp;origin=">Title</a> &#8595;</th>
+        <th style="width:200px"><a href="/chamilo/main/work/work.php?cidReq=ENGLISH101&id_session=0&gidReq=0&amp;work_direction=ASC&amp;work_page_nr=1&amp;work_per_page=20&amp;work_column=2&amp;id=&amp;origin=">Date</a></th>
+        <th class="td_actions">Detail</th>
+      </tr>
+    </table>
+*/
+
+    // The action images.
+    $action_images['new'] = 'new_lti.png';
+    $action_images['settings'] = 'settings.png';
+    
+    $actions = array();
+    $actions[] = array('action' => 'New');
+    $actions[] = array('action' => 'Settings');
+    
+    foreach ($actions as $action) {
+        $url = array();
+        $url['url'] = api_get_self()."?action=".$action['action'];
+        $url['content'] = Display::return_icon($action_images[strtolower($action['action'])], api_ucfirst(get_lang($action['action'])),'',ICON_SIZE_MEDIUM);
+        if (strtolower($action['action']) == strtolower($_GET['action'])) {
+            $url['active'] = true;
+        }
+        $action_array[] = $url;
+    }
+    
+    $content .= Display::actions($action_array);
+    
+    //$content .= Display::div($action_links, array('class'=> 'actions'));
     
 } else {
     $message = Display::return_message($plugin->get_lang('lti_warning_external_tool_not_enabled'), 'warning');
 }
 
-$tpl = new Template($tool_name);
-
 if ( isset($message) ) 
     $tpl->assign('message', $message);
 
+//<section id="main_content">
 $tpl->assign('content', $content);
 $tpl->display_one_col_template();
 
