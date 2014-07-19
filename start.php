@@ -16,24 +16,25 @@ if ($lti->is_enabled()) {
     $content = '';
 
     /// Validate actions and start building the content based on the action
-    $scope = isset($_GET['scope'])? $_GET['scope']: LTI::SCOPE_TOOL;
-    $action = isset($_GET['action'])? $_GET['action']: LTI::ACTION_SHOW;
+    $scope = isset($_GET['scope'])? strtolower($_GET['scope']): LTI::SCOPE_TOOL;
+    $action = isset($_GET['action'])? strtolower($_GET['action']): LTI::ACTION_SHOW;
     
     if ( $lti->is_teacher() ) {
-        /// Build up actionbar
-        $content .= $lti->build_actionbar($scope, $action);
 
+        if ( $action == LTI::ACTION_SHOW || $action == LTI::ACTION_CANCEL ) {
+            /// Build up actionbar
+            $content .= $lti->build_actionbar($scope, $action);
+        }
         if ( $action == LTI::ACTION_SAVE ) {
             $message = Display::return_message($lti->get_lang('lti_actionbar_'.$scope.'_'.$action.'_success'), 'success');
             $action = LTI::ACTION_SHOW;
-        }
-
-        if ( $action == LTI::ACTION_ADD ) {
+        } else if ( $action == LTI::ACTION_ADD ) {
             if( $scope == LTI::SCOPE_SETTINGS ){
                 
             } else {
                 /// Build up UI for adding a new tool
-                $content .= '<h4>Everything OK, lets add a new tool</h4>'."\n";
+                //$content .= '<h4>Everything OK, lets add a new tool</h4>'."\n";
+                $content .= $lti->build_add_external_tool_form();
             }
         } else if ( $action == LTI::ACTION_EDIT ) {
             if( $scope == LTI::SCOPE_SETTINGS ){

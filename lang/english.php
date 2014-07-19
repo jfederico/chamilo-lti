@@ -37,8 +37,8 @@ $strings['lti_course_iframe_height'] = 'iFrame heigth';
 $strings['lti_course_debug_launch'] = 'Debug launch';
 
 // Instance
-$strings['lti_actionbar_tool'] = 'Tools';
-$strings['lti_actionbar_tool_add'] = 'Add';
+$strings['lti_actionbar_tool'] = 'External tools';
+$strings['lti_actionbar_tool_add'] = 'Add external tool';
 $strings['lti_actionbar_tool_save'] = 'Save';
 $strings['lti_actionbar_tool_save_success'] = 'Tool was successfuly added';
 $strings['lti_actionbar_tool_save_error'] = 'Tool could not be added';
@@ -49,7 +49,8 @@ $strings['lti_actionbar_tool_delete'] = 'Delete';
 $strings['lti_actionbar_tool_delete_success'] = 'Tool was successfuly deleted';
 $strings['lti_actionbar_tool_delete_error'] = 'Tool could not be deleted';
 $strings['lti_actionbar_tool_show'] = 'Show';
-$strings['lti_actionbar_settings'] = 'Settings';
+$strings['lti_actionbar_tool_cancel'] = 'Cancel';
+$strings['lti_actionbar_settings'] = 'External tools settings';
 $strings['lti_actionbar_settings_save'] = 'Save';
 $strings['lti_actionbar_settings_save_success'] = 'Settings were successfuly saved';
 $strings['lti_actionbar_settings_save_error'] = 'Settings could not be saved';

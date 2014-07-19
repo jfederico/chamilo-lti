@@ -16,6 +16,7 @@ class LTI {
     const ACTION_SAVE = 'save';
     const ACTION_SHOW = 'show';
     const ACTION_DELETE = 'delete';
+    const ACTION_CANCEL = 'cancel';
     
     var $plugin;
     var $table;
@@ -76,4 +77,44 @@ class LTI {
         //$content .= Display::div($action_links, array('class'=> 'actions'));
     }
 
+    function build_add_external_tool_form(){
+        //return Display::page_header($this->get_lang('lti_actionbar_tool_add'));
+        $add_external_tool_form = "\n";
+        $add_external_tool_form .= '<form class="form-horizontal" method="post" action="'.api_get_self().'?scope=tool">'."\n";
+        $add_external_tool_form .= '<legend>'.$this->get_lang('lti_actionbar_tool_add').'</legend>'."\n";
+
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_title').':', 'dos')."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_description').':', 'dos')."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_endpoint').':', 'dos')."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_key').':', 'dos')."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_secret').':', 'dos')."\n";
+        
+        //Display::button($name, $value, $extra_attributes = array())
+        $add_external_tool_form .= Display::button('action', $this->get_lang('lti_actionbar_tool_save'), array())."\n";
+        $add_external_tool_form .= Display::button('action', $this->get_lang('lti_actionbar_tool_cancel'), array())."\n";
+        $add_external_tool_form .= '</form>';
+        
+        return $add_external_tool_form;
+        //return Display::page_header($this->get_lang('lti_actionbar_tool_add'), null, 'legend');
+    }
+    
+    function display_tool_options($uploadvisibledisabled, $origin) {
+        global $gradebook;
+        $is_allowed_to_edit = api_is_allowed_to_edit(null, true);
+    
+        if (!$is_allowed_to_edit) {
+            return;
+        }
+        echo '<form class="form-horizontal" method="post" action="'.api_get_self().'?origin='.$origin.'&gradebook='.$gradebook.'&action=settings">';
+        echo '<legend>'.get_lang('EditToolOptions').'</legend>';
+        display_default_visibility_form($uploadvisibledisabled);
+        display_studentsdelete_form();
+        echo '<div class="row">
+				<div class="formw">
+					<button type="submit" class="save" name="changeProperties" value="'.get_lang('Ok').'">'.get_lang('Ok').'</button>
+				</div>
+			</div>';
+        echo '</form>';
+    }
+    
 }
