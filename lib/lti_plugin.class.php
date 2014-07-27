@@ -2,6 +2,8 @@
 
 class LTIPlugin extends Plugin
 {
+    const PLUGIN_LTI_TOOL = 'plugin_lti_tool';
+
     public $is_course_plugin = true;
 
     //When creating a new course this settings are added to the course
@@ -32,11 +34,12 @@ class LTIPlugin extends Plugin
     }
 
     function install() {
-        $table = Database::get_main_table('plugin_lti_tool');
+        $table = Database::get_main_table(PLUGIN_LTI_TOOL);
         $sql = "CREATE TABLE IF NOT EXISTS $table (
                 id INT unsigned NOT NULL auto_increment PRIMARY KEY,
                 c_id INT unsigned NOT NULL DEFAULT 0,
                 tool_name VARCHAR(255) NOT NULL DEFAULT '',
+                tool_description TEXT NOT NULL DEFAULT '',
                 tool_endpoint VARCHAR(255) NOT NULL DEFAULT '',
                 tool_key VARCHAR(255) NOT NULL DEFAULT '',
                 tool_secret VARCHAR(255) NOT NULL DEFAULT '',
@@ -91,10 +94,85 @@ class LTIPlugin extends Plugin
         if (!is_array($values) or count($values)==0) {
             return false;
         }
-        error_log(json_encode($values), 0);
+        //error_log(json_encode($values), 0);
     }
-    
+
     function is_enabled(){
         return $this->get('tool_enable') == "true"? true: false;
+    }
+
+    function is_teacher() {
+        return api_is_course_admin() || api_is_coach() || api_is_platform_admin();
+    }
+
+    //////////////////////////////////
+    /// UX definitions and methods ///
+    //////////////////////////////////
+    const SCOPE_TOOL = 'tool';
+    const SCOPE_SETTINGS = 'settings';
+
+    const ACTION_ADD = 'add';
+    const ACTION_EDIT = 'edit';
+    const ACTION_SAVE = 'save';
+    const ACTION_SHOW = 'show';
+    const ACTION_DELETE = 'delete';
+    const ACTION_CANCEL = 'cancel';
+
+    function build_actionbar($_scope, $_action){
+        // Define action images.
+        $button_images[$this::SCOPE_TOOL.'_'.$this::ACTION_ADD] = 'new_lti.png';
+        $button_images[$this::SCOPE_SETTINGS.'_'.$this::ACTION_EDIT] = 'settings.png';
+        // Define actions.
+        $buttons = array(
+                array( "scope" => $this::SCOPE_TOOL,
+                        "action" => $this::ACTION_ADD,
+                        "title" => get_lang('lti_actionbar_'.$this::SCOPE_TOOL.'_'.$this::ACTION_ADD)
+                ),
+                array( "scope" => $this::SCOPE_SETTINGS,
+                        "action" => $this::ACTION_EDIT,
+                        "title" => get_lang('lti_actionbar_'.$this::SCOPE_SETTINGS)
+                ),
+        );
+
+        // Create the action array with the urls
+        foreach ($buttons as $button) {
+            $url = array();
+            $url['url'] = api_get_self()."?scope=".$button['scope']."&action=".$button['action'];
+            //error_log($button_images[$button['scope'].'_'.$button['action']]);
+            $url['content'] = Display::return_icon($button_images[$button['scope'].'_'.$button['action']], api_ucfirst($button['title']),'',ICON_SIZE_MEDIUM);
+            if ($button['scope'] == $_scope && $button['action'] == $_action) {
+                $url['active'] = true;
+            }
+            $action_array[] = $url;
+        }
+        // return html for actionbar
+        return Display::actions($action_array);
+        //$content .= Display::div($action_links, array('class'=> 'actions'));
+    }
+
+    function build_add_external_tool_form($settings = array()){
+        //return Display::page_header(get_lang('lti_actionbar_tool_add'));
+        $add_external_tool_form = "\n";
+        $add_external_tool_form .= '<form class="form-horizontal" method="post" action="'.api_get_self().'?scope=tool">'."\n";
+        $add_external_tool_form .= '<legend>'.get_lang('lti_actionbar_tool_add').'</legend>'."\n";
+
+        //public static function input($type, $name, $value, $extra_attributes = array()) {
+
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_title').':', Display::input('text', 'title', ''))."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_description').':', Display::input('text', 'description', ''))."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_endpoint').':', Display::input('text', 'endpoint', ''))."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_key').':', Display::input('text', 'key', ''))."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_secret').':', Display::input('password', 'secret', '').'&nbsp;&nbsp;'.Display::input('checkbox', 'secret', '').'&nbsp;'.get_lang('lti_course_secret_show'))."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_custom').':', Display::input('text', 'custom', ''))."\n";
+
+        //Display::button($name, $value, $extra_attributes = array())
+        //$add_external_tool_form .= Display::button('action', get_lang('lti_actionbar_tool_save'), array( 'type' => 'submit' ))."\n";
+        //$add_external_tool_form .= Display::button('action', get_lang('lti_actionbar_tool_cancel'), array())."\n";
+        $add_external_tool_form .= Display::input('submit', 'action', get_lang('lti_actionbar_tool_save'), array( 'type' => 'submit' ))."\n";
+        $add_external_tool_form .= Display::input('button', 'action', get_lang('lti_actionbar_tool_cancel'), array())."\n";
+        $add_external_tool_form .= '</form>';
+
+        return $add_external_tool_form;
+        //return Display::page_header(get_lang('lti_actionbar_tool_add'), null, 'legend');
     }
 }

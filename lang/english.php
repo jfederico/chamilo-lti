@@ -31,6 +31,7 @@ $strings['lti_course_description'] = 'Description';
 $strings['lti_course_endpoint'] = 'Endpoint URL';
 $strings['lti_course_key'] = 'Consumer key';
 $strings['lti_course_secret'] = 'Shared secret';
+$strings['lti_course_secret_show'] = 'Show password';
 $strings['lti_course_custom'] = 'Custom parameters';
 $strings['lti_course_open_new_window'] = 'Open in a new window';
 $strings['lti_course_iframe_height'] = 'iFrame heigth';

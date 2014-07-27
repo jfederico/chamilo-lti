@@ -3,7 +3,7 @@ require_once dirname(__FILE__).'/config.php';
 
 $course_plugin = 'lti'; //needed in order to load the plugin lang variables
 
-$lti = new LTI();
+$lti = LTIPlugin::create();
 
 $tool_name = $lti->get_lang('lti_tool_name');
 
@@ -15,18 +15,30 @@ if ($lti->is_enabled()) {
     /// Initialise content
     $content = '';
 
+    error_log($_POST);
+    error_log($_GET['action']);
+    error_log($_POST['action']);
     /// Validate actions and start building the content based on the action
     $scope = isset($_GET['scope'])? strtolower($_GET['scope']): LTI::SCOPE_TOOL;
-    $action = isset($_GET['action'])? strtolower($_GET['action']): LTI::ACTION_SHOW;
+    $action = isset($_GET['action'])? strtolower($_GET['action']): (isset($_POST['action'])? strtolower($_POST['action']): LTI::ACTION_SHOW);
     
     if ( $lti->is_teacher() ) {
 
+        error_log($action);
         if ( $action == LTI::ACTION_SHOW || $action == LTI::ACTION_CANCEL ) {
             /// Build up actionbar
             $content .= $lti->build_actionbar($scope, $action);
         }
         if ( $action == LTI::ACTION_SAVE ) {
             $message = Display::return_message($lti->get_lang('lti_actionbar_'.$scope.'_'.$action.'_success'), 'success');
+            if( $scope == LTI::SCOPE_SETTINGS ){
+            } else {
+                $lti_tool = new LTITool();
+                foreach ($lti_tool->properties as $key => $value){
+                    $lti_tool::set($key, isset($_POST[$key])? $_POST[$key]: null);
+                }
+                error_log($lti_tool->properties);
+            }
             $action = LTI::ACTION_SHOW;
         } else if ( $action == LTI::ACTION_ADD ) {
             if( $scope == LTI::SCOPE_SETTINGS ){
@@ -39,7 +51,7 @@ if ($lti->is_enabled()) {
         } else if ( $action == LTI::ACTION_EDIT ) {
             if( $scope == LTI::SCOPE_SETTINGS ){
                 /// Build up UI for configure course settings
-                $content .= '<h4>Everything OK, lets config the global settingsadd a new tool</h4>'."\n";
+                $content .= '<h4>Everything OK, lets config the global settings</h4>'."\n";
             } else {
             }
         } else {

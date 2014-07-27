@@ -1,6 +1,6 @@
 <?php
 /**
- * This script defines a class to interact with Chamilo API acting as an uintermediator for the LTI tool provider manager.
+ * This script defines a class to interact with Chamilo API acting as an intermediator for the LTI tool provider manager.
  * @package chamilo.plugin.lti
  */
 /**
@@ -29,7 +29,7 @@ class LTI {
         // initialize server settings from global settings
         $this->plugin = LTIPlugin::create();
 
-        $this->table = Database::get_main_table('plugin_lti_tool');
+        $this->table = Database::get_main_table(LTIPlugin::PLUGIN_TABLE_NAME);
 
     }
 
@@ -77,25 +77,28 @@ class LTI {
         //$content .= Display::div($action_links, array('class'=> 'actions'));
     }
 
-    function build_add_external_tool_form(){
-        //return Display::page_header($this->get_lang('lti_actionbar_tool_add'));
+    function build_add_external_tool_form($settings = array()){
+        //return Display::page_header(get_lang('lti_actionbar_tool_add'));
         $add_external_tool_form = "\n";
         $add_external_tool_form .= '<form class="form-horizontal" method="post" action="'.api_get_self().'?scope=tool">'."\n";
-        $add_external_tool_form .= '<legend>'.$this->get_lang('lti_actionbar_tool_add').'</legend>'."\n";
+        $add_external_tool_form .= '<legend>'.get_lang('lti_actionbar_tool_add').'</legend>'."\n";
 
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_title').':', 'dos')."\n";
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_description').':', 'dos')."\n";
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_endpoint').':', 'dos')."\n";
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_key').':', 'dos')."\n";
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_secret').':', 'dos')."\n";
+        //public static function input($type, $name, $value, $extra_attributes = array()) {
         
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_title').':', Display::input('text', 'title', ''))."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_description').':', Display::input('text', 'description', ''))."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_endpoint').':', Display::input('text', 'endpoint', ''))."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_key').':', Display::input('text', 'key', ''))."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_secret').':', Display::input('password', 'secret', '').'&nbsp;&nbsp;'.Display::input('checkbox', 'secret', '').'&nbsp;'.get_lang('lti_course_secret_show'))."\n";
+        $add_external_tool_form .= Display::form_row(get_lang('lti_course_custom').':', Display::input('text', 'custom', ''))."\n";
+
         //Display::button($name, $value, $extra_attributes = array())
-        $add_external_tool_form .= Display::button('action', $this->get_lang('lti_actionbar_tool_save'), array())."\n";
-        $add_external_tool_form .= Display::button('action', $this->get_lang('lti_actionbar_tool_cancel'), array())."\n";
+        $add_external_tool_form .= Display::button('action', get_lang('lti_actionbar_tool_save'), array())."\n";
+        $add_external_tool_form .= Display::button('action', get_lang('lti_actionbar_tool_cancel'), array())."\n";
         $add_external_tool_form .= '</form>';
         
         return $add_external_tool_form;
-        //return Display::page_header($this->get_lang('lti_actionbar_tool_add'), null, 'legend');
+        //return Display::page_header(get_lang('lti_actionbar_tool_add'), null, 'legend');
     }
     
     function display_tool_options($uploadvisibledisabled, $origin) {
