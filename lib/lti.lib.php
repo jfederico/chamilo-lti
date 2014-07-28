@@ -8,18 +8,6 @@
  */
 
 class LTI {
-    const SCOPE_TOOL = 'tool';
-    const SCOPE_SETTINGS = 'settings';
-
-    const ACTION_ADD = 'add';
-    const ACTION_EDIT = 'edit';
-    const ACTION_SAVE = 'save';
-    const ACTION_SHOW = 'show';
-    const ACTION_DELETE = 'delete';
-    const ACTION_CANCEL = 'cancel';
-    
-    var $plugin;
-    var $table;
 
     /**
      * Constructor (generates a connection to the API and the Chamilo settings)
@@ -77,6 +65,7 @@ class LTI {
         //$content .= Display::div($action_links, array('class'=> 'actions'));
     }
 
+    /*
     function build_add_external_tool_form($settings = array()){
         //return Display::page_header(get_lang('lti_actionbar_tool_add'));
         $add_external_tool_form = "\n";
@@ -119,5 +108,5 @@ class LTI {
 			</div>';
         echo '</form>';
     }
-    
+    */
 }

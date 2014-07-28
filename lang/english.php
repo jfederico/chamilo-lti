@@ -26,7 +26,7 @@ $strings['lti_global_custom'] = 'Custom parameters';
 $strings['lti_global_custom_help'] = 'Custom parameters';
 
 // Course configuration
-$strings['lti_course_title'] = 'Name';
+$strings['lti_course_name'] = 'Name';
 $strings['lti_course_description'] = 'Description';
 $strings['lti_course_endpoint'] = 'Endpoint URL';
 $strings['lti_course_key'] = 'Consumer key';

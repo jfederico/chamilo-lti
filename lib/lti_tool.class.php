@@ -2,13 +2,14 @@
 
 class LTITool
 {
-    var $properties;
+    public $properties;
     
     /**
      * Constructor
      */
-    function __construct($name = null, $description = null, $endpoint = null, $key = null, $secret = null, $custom = null) {
+    function __construct($id = null, $name = null, $description = null, $endpoint = null, $key = null, $secret = null, $custom = null) {
         $this->properties = array(
+                'id' => $id,
                 'name' => $name,
                 'description' => $description,
                 'endpoint' => $endpoint,
@@ -19,10 +20,13 @@ class LTITool
     }
     
     function set($key, $value){
-        $properties[$key] = $value;
+        $this->properties[$key] = $value;
     }
 
     function get($key){
-        return $properties[$key];
+        if( isset($this->properties[$key]) )
+            return $this->properties[$key];
+        else
+            return null;
     }
 }

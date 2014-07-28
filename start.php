@@ -15,56 +15,56 @@ if ($lti->is_enabled()) {
     /// Initialise content
     $content = '';
 
-    error_log($_POST);
-    error_log($_GET['action']);
-    error_log($_POST['action']);
     /// Validate actions and start building the content based on the action
-    $scope = isset($_GET['scope'])? strtolower($_GET['scope']): LTI::SCOPE_TOOL;
-    $action = isset($_GET['action'])? strtolower($_GET['action']): (isset($_POST['action'])? strtolower($_POST['action']): LTI::ACTION_SHOW);
+    $scope = isset($_GET['scope'])? strtolower($_GET['scope']): LTIPlugin::SCOPE_MAIN;
+    $action = isset($_GET['action'])? strtolower($_GET['action']): (isset($_POST['action'])? strtolower($_POST['action']): LTIPlugin::ACTION_SHOW);
     
     if ( $lti->is_teacher() ) {
-
-        error_log($action);
-        if ( $action == LTI::ACTION_SHOW || $action == LTI::ACTION_CANCEL ) {
+        if( $scope == LTIPlugin::SCOPE_MAIN ){
             /// Build up actionbar
             $content .= $lti->build_actionbar($scope, $action);
-        }
-        if ( $action == LTI::ACTION_SAVE ) {
-            $message = Display::return_message($lti->get_lang('lti_actionbar_'.$scope.'_'.$action.'_success'), 'success');
-            if( $scope == LTI::SCOPE_SETTINGS ){
-            } else {
-                $lti_tool = new LTITool();
-                foreach ($lti_tool->properties as $key => $value){
-                    $lti_tool::set($key, isset($_POST[$key])? $_POST[$key]: null);
-                }
-                error_log($lti_tool->properties);
-            }
-            $action = LTI::ACTION_SHOW;
-        } else if ( $action == LTI::ACTION_ADD ) {
-            if( $scope == LTI::SCOPE_SETTINGS ){
-                
-            } else {
+            /// Build up table/panel for teachers with tools already defined
+            $content .= $lti->build_external_tool_list();
+
+        } else if( $scope == LTIPlugin::SCOPE_TOOL ){
+            if ( $action == LTIPlugin::ACTION_ADD ) {
                 /// Build up UI for adding a new tool
-                //$content .= '<h4>Everything OK, lets add a new tool</h4>'."\n";
-                $content .= $lti->build_add_external_tool_form();
-            }
-        } else if ( $action == LTI::ACTION_EDIT ) {
-            if( $scope == LTI::SCOPE_SETTINGS ){
-                /// Build up UI for configure course settings
-                $content .= '<h4>Everything OK, lets config the global settings</h4>'."\n";
+                $content .= $lti->build_external_tool_form($action);
+            } else if ( $action == LTIPlugin::ACTION_EDIT ) {
+                /// Build up UI for adding a new tool
+                $content .= $lti->build_external_tool_form($action);
             } else {
+                if ( $action == LTIPlugin::ACTION_SAVE ) {
+                    $lti_tool = new LTITool();
+                    foreach ($lti_tool->properties as $key => $value){
+                        $lti_tool->set($key, isset($_POST[$key])? $_POST[$key]: null);
+                    }
+                    if( $lti->save_external_tool($lti_tool) ){
+                        $message = Display::return_message($lti->get_lang('lti_actionbar_'.$scope.'_'.$action.'_success'), 'success');
+                    } else {
+                        $message = Display::return_message($lti->get_lang('lti_actionbar_'.$scope.'_'.$action.'_error'), 'error');
+                    }
+                }
+                
+                /// Build up actionbar
+                $content .= $lti->build_actionbar($scope, $action);
+                /// Build up table/panel for teachers with tools already defined
+                $content .= $lti->build_external_tool_list();
             }
+
         } else {
-            /// Build up table/panel for teachers with tools already defined 
-            $content .= '<h4>Everything OK, lets show the tools added</h4>'."\n";
+            if ( $action == LTIPlugin::ACTION_EDIT ) {
+                $content .= $lti->build_settings_form();
+            }
+
         }
     } else {
         /// Build up table/panel for students with tools already defined
-        $content .= '<h4>Everything OK, lets show the tools added</h4>'."\n";
+        $content .= $lti->build_external_tool_list();
     }
 
 } else {
-    $message = Display::return_message($plugin->get_lang('lti_warning_external_tool_not_enabled'), 'warning');
+    $message = Display::return_message($lti->get_lang('lti_warning_external_tool_not_enabled'), 'warning');
 }
 
 if ( isset($message) ) 

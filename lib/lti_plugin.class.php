@@ -4,8 +4,9 @@ class LTIPlugin extends Plugin
 {
     const PLUGIN_LTI_TOOL = 'plugin_lti_tool';
 
+    protected $table;
     public $is_course_plugin = true;
-
+    
     //When creating a new course this settings are added to the course
     //Course tool providers should be set up here
     //public $course_settings = array(
@@ -20,12 +21,9 @@ class LTIPlugin extends Plugin
     //                array('name' => 'lti_course_debug_launch', 'type' => 'checkbox')
     //);
 
-    static function create() {
-        static $result = null;
-        return $result ? $result : $result = new self();
-    }
-
     protected function __construct() {
+        $this->table = Database::get_main_table(self::PLUGIN_LTI_TOOL);
+
         //parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'lti_global_tool_producer' => 'meta-form'));
         //parent::__construct('1.0', 'Jesus Federico', array('lti_global_tool_enable' => 'boolean', 'lti_global_endpoint' => 'text', 'lti_global_key' => 'text', 'lti_global_secret' => 'text', 'lti_global_custom' => 'textarea'));
         //parent::__construct('1.0', 'Jesus Federico', array('tool_enable' => 'boolean', 'lti_global_endpoint' => 'text', 'lti_global_key' => 'text', 'lti_global_secret' => 'text', 'lti_global_custom' => 'text'));
@@ -33,19 +31,22 @@ class LTIPlugin extends Plugin
         //Global tool providers should be set up here
     }
 
-    function install() {
-        $table = Database::get_main_table(PLUGIN_LTI_TOOL);
-        $sql = "CREATE TABLE IF NOT EXISTS $table (
-                id INT unsigned NOT NULL auto_increment PRIMARY KEY,
-                c_id INT unsigned NOT NULL DEFAULT 0,
-                tool_name VARCHAR(255) NOT NULL DEFAULT '',
-                tool_description TEXT NOT NULL DEFAULT '',
-                tool_endpoint VARCHAR(255) NOT NULL DEFAULT '',
-                tool_key VARCHAR(255) NOT NULL DEFAULT '',
-                tool_secret VARCHAR(255) NOT NULL DEFAULT '',
-                tool_custom TEXT NOT NULL DEFAULT '')";
-        Database::query($sql);
+    static function create() {
+        static $result = null;
+        return $result ? $result : $result = new self();
+    }
 
+    function install() {
+        $sql = "CREATE TABLE IF NOT EXISTS $this->table (".
+               " id INT unsigned NOT NULL auto_increment PRIMARY KEY,".
+               " c_id INT unsigned NOT NULL DEFAULT 0,".
+               " tool_name VARCHAR(255) NOT NULL DEFAULT '',".
+               " tool_description TEXT NOT NULL DEFAULT '',".
+               " tool_endpoint VARCHAR(255) NOT NULL DEFAULT '',".
+               " tool_key VARCHAR(255) NOT NULL DEFAULT '',".
+               " tool_secret VARCHAR(255) NOT NULL DEFAULT '',".
+               " tool_custom TEXT NOT NULL DEFAULT '');";
+        
         //Installing course settings
         $this->install_course_fields_in_all_courses();
     }
@@ -108,6 +109,7 @@ class LTIPlugin extends Plugin
     //////////////////////////////////
     /// UX definitions and methods ///
     //////////////////////////////////
+    const SCOPE_MAIN = 'main';
     const SCOPE_TOOL = 'tool';
     const SCOPE_SETTINGS = 'settings';
 
@@ -150,29 +152,86 @@ class LTIPlugin extends Plugin
         //$content .= Display::div($action_links, array('class'=> 'actions'));
     }
 
-    function build_add_external_tool_form($settings = array()){
+    function build_external_tool_form($action = LTIPlugin::ACTION_ADD, $settings = array()){
+        if ( $action == LTIPlugin::ACTION_EDIT ) {
+            ///Lookup for settings
+        }
         //return Display::page_header(get_lang('lti_actionbar_tool_add'));
-        $add_external_tool_form = "\n";
-        $add_external_tool_form .= '<form class="form-horizontal" method="post" action="'.api_get_self().'?scope=tool">'."\n";
-        $add_external_tool_form .= '<legend>'.get_lang('lti_actionbar_tool_add').'</legend>'."\n";
+        $external_tool_form = "\n";
+        $external_tool_form .= '<form class="form-horizontal" method="post" action="'.api_get_self().'?scope=tool">'."\n";
+        $external_tool_form .= '<legend>'.get_lang('lti_actionbar_tool_add').'</legend>'."\n";
 
         //public static function input($type, $name, $value, $extra_attributes = array()) {
 
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_title').':', Display::input('text', 'title', ''))."\n";
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_description').':', Display::input('text', 'description', ''))."\n";
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_endpoint').':', Display::input('text', 'endpoint', ''))."\n";
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_key').':', Display::input('text', 'key', ''))."\n";
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_secret').':', Display::input('password', 'secret', '').'&nbsp;&nbsp;'.Display::input('checkbox', 'secret', '').'&nbsp;'.get_lang('lti_course_secret_show'))."\n";
-        $add_external_tool_form .= Display::form_row(get_lang('lti_course_custom').':', Display::input('text', 'custom', ''))."\n";
+        $external_tool_form .= Display::form_row(get_lang('lti_course_name').':', Display::input('text', 'name', ''))."\n";
+        $external_tool_form .= Display::form_row(get_lang('lti_course_description').':', Display::input('text', 'description', ''))."\n";
+        $external_tool_form .= Display::form_row(get_lang('lti_course_endpoint').':', Display::input('text', 'endpoint', ''))."\n";
+        $external_tool_form .= Display::form_row(get_lang('lti_course_key').':', Display::input('text', 'key', ''))."\n";
+        $external_tool_form .= Display::form_row(get_lang('lti_course_secret').':', Display::input('password', 'secret', '').'&nbsp;&nbsp;'.Display::input('checkbox', 'secret', '').'&nbsp;'.get_lang('lti_course_secret_show'))."\n";
+        $external_tool_form .= Display::form_row(get_lang('lti_course_custom').':', Display::input('text', 'custom', ''))."\n";
 
         //Display::button($name, $value, $extra_attributes = array())
-        //$add_external_tool_form .= Display::button('action', get_lang('lti_actionbar_tool_save'), array( 'type' => 'submit' ))."\n";
-        //$add_external_tool_form .= Display::button('action', get_lang('lti_actionbar_tool_cancel'), array())."\n";
-        $add_external_tool_form .= Display::input('submit', 'action', get_lang('lti_actionbar_tool_save'), array( 'type' => 'submit' ))."\n";
-        $add_external_tool_form .= Display::input('button', 'action', get_lang('lti_actionbar_tool_cancel'), array())."\n";
-        $add_external_tool_form .= '</form>';
+        //$external_tool_form .= Display::button('action', get_lang('lti_actionbar_tool_save'), array( 'type' => 'submit' ))."\n";
+        //$external_tool_form .= Display::button('action', get_lang('lti_actionbar_tool_cancel'), array())."\n";
+        $external_tool_form .= Display::input('submit', 'action', get_lang('lti_actionbar_tool_save'), array( 'id' => LTIPlugin::ACTION_SAVE ))."\n";
+        $external_tool_form .= Display::input('submit', 'action', get_lang('lti_actionbar_tool_cancel'), array( 'id' => LTIPlugin::ACTION_CANCEL ))."\n";
+        $external_tool_form .= '</form>';
 
-        return $add_external_tool_form;
+        return $external_tool_form;
         //return Display::page_header(get_lang('lti_actionbar_tool_add'), null, 'legend');
+    }
+
+    function build_external_tool_list() {
+        $external_tool_list = "\n";
+
+        $tool_list = Database::select('*', $this->table, array('where' => array('c_id = ? ' => api_get_course_int_id())));
+        foreach ($tool_list as $tool) {
+            $external_tool_list .= '<h4>'.$tool['tool_name'].'</h4>'."\n";
+        }
+        return $external_tool_list;
+    }
+
+    function build_settings_form() {
+        $settings_form = "\n";
+        $settings_form .= '<h4>Everything OK, lets config the global settings</h4>'."\n";
+        return $settings_form;
+    }
+    
+    function save_external_tool(LTITool $lti_tool){
+        try {
+            //$table = Database::get_main_table(self::PLUGIN_LTI_TOOL);
+
+            if( $id = $lti_tool->get('id') ) {
+                $sql = "SELECT * FROM $table WHERE id = $id;";
+                //Database::query($sql);
+                
+            } else {
+                $params['c_id'] = api_get_course_int_id();
+                foreach ( $lti_tool->properties as $key => $value ) {
+                    if( $key != 'id' && $value != null ) {
+                        $params['tool_'.$key] = $lti_tool->get($key);
+                        error_log('tool_'.$key.'='.$params['tool_'.$key]);
+                    }
+                }
+                
+                // Validates if all the required parameters are set
+                if( $params['tool_name'] == null || $params['tool_description'] == null || $params['tool_endpoint'] == null || $params['tool_key'] == null || $params['tool_secret'] == null){
+                    error_log('Not all the parameters required are set');
+                    return FALSE;
+                }
+                
+                error_log(json_encode($params));
+                $id = Database::insert($this->table, $params);
+                if ($id) {
+                    return TRUE;
+                } else {
+                    error_log('Record could not be inserted');
+                    return FALSE;
+                }
+            }
+        } catch ( Exception $e ) {
+            error_log('Exception catched: '.$e->getMessage());
+            return FALSE;
+        }
     }
 }
