@@ -184,10 +184,29 @@ class LTIPlugin extends Plugin
     function build_external_tool_list() {
         $external_tool_list = "\n";
 
+        $headers = array( get_lang('lti_list_header_type'), get_lang('lti_list_header_name'), get_lang('lti_list_header_description'), get_lang('lti_list_header_actions') );
+        $rows = array();
+
         $tool_list = Database::select('*', $this->table, array('where' => array('c_id = ? ' => api_get_course_int_id())));
+        //$sql = "SELECT * FROM $file_tbl WHERE c_id = $course_id AND session_id = $session_id";
+        //$result = Database::query($sql);
         foreach ($tool_list as $tool) {
-            $external_tool_list .= '<h4>'.$tool['tool_name'].'</h4>'."\n";
+            $rows[] = array(
+                    Display::return_icon('lti.png', get_lang('lti_actionbar_tool_launch'), array('class' => 'link', 'align' => 'center'), ICON_SIZE_MEDIUM),
+                    $tool['tool_name'],
+                    $tool['tool_description'],
+                    Display::url(get_lang('lti_actionbar_tool_edit'), api_get_self().'?scope=tool&action=edit&id='.$tool['id'], array('class' => 'icon')).
+                    "&nbsp;".
+                    Display::url(get_lang('lti_actionbar_tool_delete'), api_get_self().'?scope=tool&action=delete&id='.$tool['id'], array())
+            );
         }
+        //foreach ($tool_list as $tool) {
+        //    $external_tool_list .= '<h4>'.$tool['tool_name'].'</h4>'."\n";
+        //}
+        error_log($rows);
+        $external_tool_list .= Display::table($headers, $rows);
+        error_log($external_tool_list);
+
         return $external_tool_list;
     }
 
